@@ -9,7 +9,7 @@ defmodule Wx.Worker do
     GenServer.start_link(__MODULE__, :ok, opts ++ [name: MW] )
   end
 
-  def get_temperature(location) do
+  def get_weather(location) do
     GenServer.call(@name, {:location, location})
   end
 
@@ -38,10 +38,11 @@ defmodule Wx.Worker do
   end
 
   def handle_call({:location, location}, _from, stats) do
-    case temperature_of(location) do
-      {:ok, temp} ->
-        new_stats = update_stats(stats, location)
-        {:reply, "#{temp} F", new_stats}
+    #case temperature_of(location) do
+    case weather_of(location) do
+      {:ok, weather} ->
+        #new_stats = update_stats(stats, location)
+        {:reply, weather, stats}
 
       _ ->
         {:reply, :error, stats}
@@ -67,7 +68,7 @@ defmodule Wx.Worker do
 
   ## Helper Functions
 
-  defp temperature_of(location) do
+  defp weather_of(location) do
     url_for(location) |> IO.inspect |> HTTPoison.get |> parse_response
   end
 
@@ -77,18 +78,22 @@ defmodule Wx.Worker do
 
   defp parse_response({:ok, %HTTPoison.Response{body: body, status_code: 200}})
   do
-    body |> JSON.decode! |> compute_temperature
+    body |> JSON.decode! |> process_weather
   end
 
   defp parse_response(_) do
     :error
   end
 
-  defp compute_temperature(json) do
+  defp process_weather(json) do
     IO.inspect json
+    weather = %{}
     try do
       temp = (json["main"]["temp"] * 9/5 - 459.67) |> Float.round(1)
-      {:ok, temp}
+      weather = Map.put_new(weather, :temp, temp)
+      humid = json["main"]["humidity"]
+      weather = Map.put_new(weather, :humid, humid)
+      {:ok, weather}
     rescue
       _ -> :error
     end
