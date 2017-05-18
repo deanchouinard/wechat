@@ -14,7 +14,8 @@ defmodule Wechat.Application do
       supervisor(Wechat.Web.Endpoint, []),
       # Start your own worker by calling: Wechat.Worker.start_link(arg1, arg2, arg3)
       # worker(Wechat.Worker, [arg1, arg2, arg3]),
-      worker(Wx.Worker, [])
+      worker(Wx.Worker, []),
+      worker(Wx.AprsWx, [])
     ]
 
     # See http://elixir-lang.org/docs/stable/elixir/Supervisor.html

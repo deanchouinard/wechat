@@ -37,7 +37,8 @@ defmodule Wechat.Mixfile do
      {:gettext, "~> 0.11"},
      {:cowboy, "~> 1.0"},
      {:httpoison, "~> 0.11.1"},
-     {:json, "~> 1.0"} ]
+     {:json, "~> 1.0"},
+     {:floki, "~> 0.17.0"} ]
   end
 
   # Aliases are shortcuts or tasks specific to the current project.

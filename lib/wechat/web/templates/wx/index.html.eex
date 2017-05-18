@@ -2,4 +2,6 @@
 <%= @weather.temp %>
 <h3>Humidity: </h3>
 <%= @weather.humid %>
+<h2>APRS WX</h2>
+<%= @aweather %>
 
