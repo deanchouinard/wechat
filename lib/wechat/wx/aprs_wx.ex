@@ -68,6 +68,11 @@ defmodule Wx.AprsWx do
 
   ## Helper Functions
 
+  defp weather_of(:file) do
+    body = file_data()
+    parse_response({:ok, %HTTPoison.Response{body: body, status_code: 200}})
+  end
+
   defp weather_of(location) do
     url_for(location) |> IO.inspect |> HTTPoison.get |> parse_response
   end
@@ -78,13 +83,18 @@ defmodule Wx.AprsWx do
   end
 
   defp parse_response({:ok, %HTTPoison.Response{body: body, status_code: 200}})
+  #defp parse_response({:ok, body })
   do
     #body |> JSON.decode! |> process_weather
-    body = Floki.parse(body) |> Floki.find("tt") |> Floki.text |>
-    String.split("\n") |> Enum.filter(fn (x) -> x != "" end) |> List.last |>
-    String.slice(80..90)
     IO.inspect body, label: "body:"
-    {:ok, body}
+    body = Floki.parse(body) |> Floki.find("tt") |> Floki.text |>
+      String.split("\n") |> Enum.filter(fn (x) -> x != "" end) |> List.last
+    
+    fields = [{:temp, 84..86}, {:humid, 100..101}, {:barom, 103..106}]
+    
+    fbody = for {f, r} <- fields, into: %{}, do: {f, String.slice(body, r)}
+    #for {f, r} <- fields, into: %{}, do: {f, r}
+    {:ok, fbody}
   end
 
   defp parse_response(_) do
@@ -117,6 +127,11 @@ defmodule Wx.AprsWx do
       false ->
         Map.put_new(old_stats, location, 1)
     end
+  end
+
+  defp file_data do
+    {:ok, page} = File.read("test/RawDW4966.html")
+    page
   end
 
 end

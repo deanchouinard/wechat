@@ -3,5 +3,6 @@
 <h3>Humidity: </h3>
 <%= @weather.humid %>
 <h2>APRS WX</h2>
-<%= @aweather %>
-
+<p>Temp:</p><%= @aweather.temp %>
+<p>Humidity:</p><%= @aweather.humid %>
+<p>Pressure: </p><%= @aweather.barom %>
